@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Calculate how much water to add to dilute your dram down.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Whiskey Dilution Calculator</title>
+    <script src="https://unpkg.com/vue"></script>
+    <style media="screen">
+      body {
+        background-color: whitesmoke;
+        color: #333;
+        font-family: 'Palatino';
+        padding: 10px;
+        text-align: center;
+      }
+
+      .container {
+        background-color: #fff;
+        border-radius: 3px;
+        display: inline-block;
+        padding: 0 3em;
+      }
+
+      input {
+        background: transparent;
+        border: 0;
+        border-bottom: 1px dashed #ccc;
+        font-family: 'Palatino';
+        font-size: 1em;
+        margin: 0 5px;
+        outline: none;
+        text-align: center;
+        width: 60px;
+      }
+
+      strong {
+        font-size: 1.2em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app" class="container">
+      <h1>Whiskey Dilution Calculator</h1>
+
+      <p>
+        <label>
+          Dram size
+          <input v-model="sourceAmountInCentilitres" type="number" min="0" step="0.1">cl
+        </label>
+      </p>
+
+      <p>
+        <label>
+          Neat strength
+          <input v-model="sourceABV" type="number" min="1" max="100" step="0.1">%
+        </label>
+      </p>
+
+      <p>
+        <label>
+          Desired strength
+          <input v-model="targetABV" type="number" min="1" max="100" step="0.1">%
+        </label>
+      </p>
+
+      <div v-if="hasValidWaterAmount">
+        <p>
+          You'll need to add <strong>{{ waterAmountInMillilitres | round }} ml</strong> of water.
+        </p>
+
+        <h2>Enjoy!</h2>
+      </div>
+    </div>
+
+    <script>
+      const app = new Vue({
+        el: '#app',
+        data: {
+          sourceAmountInCentilitres: undefined,
+          sourceABV: undefined,
+          targetABV: undefined
+        },
+        computed: {
+          hasValidWaterAmount () {
+            return this.isFiniteNumber(this.waterAmountInMillilitres)
+          },
+          sourceAmountInMillilitres () {
+            return this.sourceAmountInCentilitres * 10
+          },
+          waterAmountInMillilitres () {
+            return this.sourceAmountInMillilitres * ((this.sourceABV / this.targetABV) - 1)
+          }
+        },
+        filters: {
+          round (number) {
+            return number.toFixed(1)
+          }
+        },
+        methods: {
+          isFiniteNumber (value) {
+            return typeof value == 'number' && isFinite(value)
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
